@@ -3,7 +3,7 @@ Here’s a concrete plan for a **small, realistic POC setup** to explore **loggi
 ---
 
 
-## 🔬 **POC Services**
+## Feature: **POC Services**
 
 Keep it **small but realistic**:
 
