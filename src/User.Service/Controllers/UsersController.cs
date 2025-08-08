@@ -1,0 +1,43 @@
+using Microsoft.AspNetCore.Mvc;
+using User.Service.Models;
+
+namespace User.Service.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class UsersController : ControllerBase
+{
+    private readonly ILogger<UsersController> _logger;
+
+    private static readonly List<Models.User> _users = new List<Models.User>
+    {
+        new Models.User { Id = 1, Name = "Alice", Email = "alice@example.com" },
+        new Models.User { Id = 2, Name = "Bob", Email = "bob@example.com" }
+    };
+
+    public UsersController(ILogger<UsersController> logger)
+    {
+        _logger = logger;
+    }
+
+    [HttpGet]
+    public IEnumerable<Models.User> Get()
+    {
+        _logger.LogInformation("Getting all users");
+        return _users;
+    }
+
+    [HttpGet("{id}")]
+    public ActionResult<Models.User> Get(int id)
+    {
+        _logger.LogInformation("Getting user by id {id}", id);
+        var user = _users.FirstOrDefault(u => u.Id == id);
+
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        return user;
+    }
+}

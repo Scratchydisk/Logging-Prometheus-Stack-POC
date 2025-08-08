@@ -36,6 +36,44 @@ All observability stack services are managed locally via **Docker Compose**.
 
 ## Running Locally
 
+### Getting Started
+
+ To verify the logs and metrics in Grafana:
+
+   1. Access Grafana: Open your web browser and navigate to http://localhost:3000. The default credentials are
+      admin/admin. You will be prompted to change the password on first login.
+
+   2. Verify Data Sources:
+       * Once logged in, go to "Configuration" (gear icon on the left sidebar) -> "Data Sources".
+       * You should see "Prometheus" and "Loki" data sources listed and configured.
+
+   3. Verify Logs (Loki):
+       * Go to "Explore" (compass icon on the left sidebar).
+       * Select the "Loki" data source.
+       * In the Log browser, you can enter $ git diff --cached to see logs from all services. You should see logs appearing
+         from bff.api, order.service, payment.service, and user.service.
+
+   4. Verify Metrics (Prometheus):
+       * In "Explore", select the "Prometheus" data source.
+       * Enter http_requests_received_total in the query field and run the query. You should see metrics data.
+
+   5. Verify Custom Dashboard:
+       * Go to "Dashboards" (dashboard icon on the left sidebar) -> "Browse".
+       * You should find a dashboard named "Microservices Dashboard". Click on it.
+       * This dashboard should display both logs and the http_requests_received_total metric.
+
+  To generate some logs and metrics, you can access the API endpoints:
+
+   * Bff.Api: http://localhost:8080/swagger (and try the /Bff/user/{id} endpoint)
+   * Order.Service: http://localhost:8081/swagger
+   * Payment.Service: http://localhost:8082/swagger
+   * User.Service: http://localhost:8083/swagger
+
+  You can also directly access the Prometheus metrics endpoint for each service (e.g.,
+  http://localhost:8080/metrics).
+
+### Other References
+
 See `docker-compose.yml` for setup:
 - MSSQL (database): `localhost:1433`
 - RabbitMQ (message bus): `localhost:5672`, Management UI `:15672`
