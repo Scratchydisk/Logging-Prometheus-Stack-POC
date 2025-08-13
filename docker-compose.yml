@@ -44,13 +44,13 @@ services:
     #  - optional
 
   loki:
-    image: grafana/loki:2.4.1
+    image: grafana/loki:3.5.3
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
 
   prometheus:
-    image: prom/prometheus:v2.30.3
+    image: prom/prometheus:v3.4.2
     ports:
       - "9090:9090"
     volumes:
@@ -58,7 +58,7 @@ services:
     command: --config.file=/etc/prometheus/prometheus.yml
 
   grafana:
-    image: grafana/grafana:8.2.2
+    image: grafana/grafana:12.2.0-16895479002
     ports:
       - "3000:3000"
     environment:

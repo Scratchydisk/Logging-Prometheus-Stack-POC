@@ -1,25 +1,35 @@
 using Serilog;
-using Serilog.Formatting.Compact;
-using Serilog.Sinks.Http.BatchFormatters;
 using Prometheus;
+using Serilog.Sinks.Grafana.Loki;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((context, services, configuration) =>
 {
     var lokiUrl = context.Configuration["LokiUrl"];
-    Console.WriteLine($"Loki URL from appsettings: {lokiUrl}");
-    configuration
-        .WriteTo.Console(new Serilog.Formatting.Json.JsonFormatter());
+    if (string.IsNullOrWhiteSpace(lokiUrl))
+    {
+        throw new InvalidOperationException("LokiUrl configuration value is missing or empty.");
+    }
 
-    if (!string.IsNullOrWhiteSpace(lokiUrl))
+    var applicationName = context.Configuration["ApplicationName"] ?? "Bff.Api";
+
+    var labels = new List<LokiLabel>
     {
-        configuration.WriteTo.Http(lokiUrl, queueLimitBytes: null, batchFormatter: new ArrayBatchFormatter());
-    }
-    else
-    {
-        Console.WriteLine("Warning: LokiUrl is not configured. Skipping Serilog HTTP sink setup.");
-    }
+        new () {Key ="app", Value=applicationName },
+        new () {Key ="env", Value=context.HostingEnvironment.EnvironmentName }
+    };
+
+    configuration
+        .MinimumLevel.Information()
+        .Enrich.FromLogContext()
+        .Enrich.WithProperty("Application", applicationName)
+        .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName)
+        .WriteTo.Console()
+        .WriteTo.GrafanaLoki(
+            lokiUrl,
+            credentials: null,
+            labels: labels);
 });
 
 // Add services to the container.
@@ -48,4 +58,11 @@ app.MapControllers();
 
 app.MapMetrics();
 
-app.Run();
+try
+{
+    app.Run();
+}
+finally
+{
+    Log.CloseAndFlush();
+}
