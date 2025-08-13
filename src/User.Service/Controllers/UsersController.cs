@@ -40,4 +40,14 @@ public class UsersController : ControllerBase
 
         return user;
     }
+
+    [HttpGet("error")]
+    public IActionResult Error()
+    {
+        _logger.LogError("Generating a divide by zero error for testing purposes");
+        int zero = 0;
+        int result = 1 / zero; // This will throw a DivideByZeroException
+    
+        return StatusCode(500, "An error occurred");
+    }
 }

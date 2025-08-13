@@ -1,7 +1,7 @@
 ## 🔄 Project Awareness & Context
 
 - **Always review `architecture.md`** before starting work to understand architecture, goals, and constraints.
-- **Check or update `TASK.md`** before beginning new tasks. If the task isn’t listed, add it with a short description and today’s date.
+- **Create or update `TASK.md`** before beginning new tasks. If the task isn’t listed, add it with a short description and today’s date.
 - **Maintain consistent file structure and naming conventions** as outlined in `architecture.md`.
 - **Use `appsettings.Development.json` or `.env` files** for secrets or configuration during local development.
 

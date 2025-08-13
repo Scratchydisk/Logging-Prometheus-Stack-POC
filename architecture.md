@@ -45,4 +45,7 @@
   * **Prometheus** (metrics scraping).
   * **Grafana** (dashboards, alerts).
 
+## **References**
+
+* [Serilog Sinks Grafana Loki](https://github.com/serilog-contrib/serilog-sinks-grafana-loki)
 ---

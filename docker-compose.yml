@@ -40,6 +40,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
+    #profiles:
+    #  - optional
 
   loki:
     image: grafana/loki:2.4.1

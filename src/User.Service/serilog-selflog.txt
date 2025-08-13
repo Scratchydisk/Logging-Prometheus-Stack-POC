@@ -1,0 +1,8 @@
+2025-08-08T10:32:09.9864462Z Received failure on HTTP shipping (400): error at least one label pair is required per stream
+. 8 log events will be dropped
+2025-08-08T10:32:20.9958299Z Received failure on HTTP shipping (400): error at least one label pair is required per stream
+. 32 log events will be dropped
+2025-08-08T10:32:22.0022715Z Received failure on HTTP shipping (400): error at least one label pair is required per stream
+. 28 log events will be dropped
+2025-08-08T10:38:02.2723554Z Received failure on HTTP shipping (400): error at least one label pair is required per stream
+. 4 log events will be dropped
