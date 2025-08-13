@@ -103,13 +103,13 @@ This project doubles as a testbed for leveraging AI in both project planning and
 
 ### How did the AI Fare?
 
-I used Gemmini cli for most of the AI work.
+I used Gemini cli for most of the AI work and VSCode with the Continue plugin for code completion, using GPT 4o and 4.1.
 
 In general it was very productive.
 
-However it struggled to wire up Loki and Serilog properly; it really got stuck on setting up labels and it really got the version numbers in the docker-compose well out of date.
+However it struggled to wire up Loki and Serilog properly; it really got stuck on setting up labels and it got the version numbers in the docker-compose well out of date.
 
-I tried GPT 4.1 on the labels issue but in the end I had to review the serilog-loki github repo to work out how the labels worked.
+I tried GPT 4.1 on the labels issue but in the end I had to review the [serilog-sinks-grafana-loki github repo](https://github.com/serilog-contrib/serilog-sinks-grafana-loki) to work out how the labels worked.
 
 ---
 
