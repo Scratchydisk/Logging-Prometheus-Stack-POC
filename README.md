@@ -23,6 +23,8 @@ This project is **also an experiment in AI context engineering**, using AI to pl
 
 All services use **.NET 8 Web APIs**.
 
+**Note:** The `/checkout` and UI features have not been implemented because the simple backend services were enough to prove out the Loki / Grafana observability setup.
+
 ---
 
 ## Observability Stack
@@ -50,12 +52,12 @@ All observability stack services are managed locally via **Docker Compose**.
    3. Verify Logs (Loki):
        * Go to "Explore" (compass icon on the left sidebar).
        * Select the "Loki" data source.
-       * In the Log browser, you can enter $ git diff --cached to see logs from all services. You should see logs appearing
-         from bff.api, order.service, payment.service, and user.service.
+       * On the right of the page there's a `Builder` and `Code` toggle, click `Code`.
+       * Click on the query input and enter `{env="Development"}` to see logs from all services. You should see logs appearing from bff.api, order.service, payment.service, and user.service.
 
    4. Verify Metrics (Prometheus):
        * In "Explore", select the "Prometheus" data source.
-       * Enter http_requests_received_total in the query field and run the query. You should see metrics data.
+       * Enter `http_requests_received_total` in the query field and run the query. You should see metrics data.
 
    5. Verify Custom Dashboard:
        * Go to "Dashboards" (dashboard icon on the left sidebar) -> "Browse".
