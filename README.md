@@ -59,7 +59,7 @@ All observability stack services are managed locally via **Docker Compose**.
 
    5. Verify Custom Dashboard:
        * Go to "Dashboards" (dashboard icon on the left sidebar) -> "Browse".
-       * You should find a dashboard named "Microservices Dashboard". Click on it.
+       * You should find a dashboard named "BFF + Services API...". Click on it.
        * This dashboard should display both logs and the http_requests_received_total metric.
 
   To generate some logs and metrics, you can access the API endpoints:
