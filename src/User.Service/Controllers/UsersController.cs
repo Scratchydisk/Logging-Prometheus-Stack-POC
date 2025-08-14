@@ -28,9 +28,16 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Models.User> Get(int id)
+    public async Task<ActionResult<Models.User>> Get(int id)
     {
         _logger.LogInformation("Getting user by id {id}", id);
+
+        if (id == 2)
+        {
+            _logger.LogInformation("Simulating 200ms latency for user 2");
+            await Task.Delay(200); // Simulate 200ms latency
+        }
+
         var user = _users.FirstOrDefault(u => u.Id == id);
 
         if (user == null)

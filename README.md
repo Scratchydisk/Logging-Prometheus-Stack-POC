@@ -74,6 +74,10 @@ All observability stack services are managed locally via **Docker Compose**.
   You can also directly access the Prometheus metrics endpoint for each service (e.g.,
   http://localhost:8080/metrics).
 
+### Testing Scenarios
+
+For detailed test scenarios to prove out the Grafana dashboard and observability features, refer to the [Grafana Scenarios documentation](./grafana-scenarios.md).
+
 ## Grafana Screenshots
 
 Here are some screenshots of the Grafana dashboard:
