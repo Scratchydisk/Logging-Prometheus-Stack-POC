@@ -1,6 +1,7 @@
 using Serilog;
 using Prometheus;
 using Serilog.Sinks.Grafana.Loki;
+using Serilog.Enrichers.Span;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,7 @@ builder.Host.UseSerilog((context, services, configuration) =>
         .Enrich.FromLogContext()
         .Enrich.WithProperty("Application", applicationName)
         .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName)
+        .Enrich.WithSpan()
         .WriteTo.Console()
         .WriteTo.GrafanaLoki(
             lokiUrl,

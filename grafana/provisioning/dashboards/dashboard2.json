@@ -1,0 +1,556 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": {
+                    "type": "grafana",
+                    "uid": "-- Grafana --"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "editable": true,
+    "graphTooltip": 1,
+    "id": null,
+    "links": [],
+    "liveNow": false,
+    "panels": [
+        {
+            "type": "row",
+            "title": "Traffic",
+            "collapsed": false,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            }
+        },
+        {
+            "id": 1,
+            "title": "Requests per time period (by app)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 1
+            },
+            "datasource": {
+                "type": "loki",
+                "uid": "${DS_LOKI}"
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "sum by (app) (\n  count_over_time(\n    {app=~\"$app\", env=~\"$env\"}\n    |= \"Request finished\"\n    | json\n    | RequestPath != \"/metrics\"\n    [$__interval]\n  )\n)"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "title": "Exceptions per time period (by app)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 1
+            },
+            "datasource": {
+                "type": "loki",
+                "uid": "${DS_LOKI}"
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "sum by (app) (\n  count_over_time(\n    {app=~\"$app\", env=~\"$env\"}\n    | json\n    | level=\"error\"\n    [$__interval]\n  )\n)"
+                },
+                {
+                    "refId": "B",
+                    "expr": "sum by (app) (\n  count_over_time(\n    {app=~\"$app\", env=~\"$env\"}\n    |= \"Request finished\"\n    |~ \"StatusCode\\\":5[0-9][0-9]\"\n    [$__interval]\n  )\n)"
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "title": "% error calls (by app)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 9
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "percent"
+                },
+                "overrides": []
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "datasource": {
+                        "type": "loki",
+                        "uid": "${DS_LOKI}"
+                    },
+                    "expr": "sum by (app) (\n  count_over_time(\n    {app=~\"$app\", env=~\"$env\"}\n    |= \"Request finished\" | json | RequestPath != \"/metrics\"\n    [$__interval]\n  )\n)"
+                },
+                {
+                    "refId": "B",
+                    "datasource": {
+                        "type": "loki",
+                        "uid": "${DS_LOKI}"
+                    },
+                    "expr": "sum by (app) (\n  count_over_time(\n    {app=~\"$app\", env=~\"$env\"}\n    | json | level=\"error\"\n    [$__interval]\n  )\n)"
+                },
+                {
+                    "refId": "C",
+                    "datasource": {
+                        "type": "__expr__",
+                        "uid": "__expr__"
+                    },
+                    "type": "math",
+                    "expression": "100 * $B / $A"
+                }
+            ]
+        },
+        {
+            "type": "row",
+            "title": "Latency",
+            "collapsed": false,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 17
+            }
+        },
+        {
+            "id": 4,
+            "title": "Latency percentiles (ElapsedMilliseconds)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 18
+            },
+            "datasource": {
+                "type": "loki",
+                "uid": "${DS_LOKI}"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "ms"
+                },
+                "overrides": []
+            },
+            "targets": [
+                {
+                    "refId": "P50",
+                    "expr": "quantile_over_time(0.50,\n  {app=~\"$app\", env=~\"$env\"}\n  |= \"Request finished\" | json | unwrap ElapsedMilliseconds\n  [$__interval]\n)"
+                },
+                {
+                    "refId": "P90",
+                    "expr": "quantile_over_time(0.90,\n  {app=~\"$app\", env=~\"$env\"}\n  |= \"Request finished\" | json | unwrap ElapsedMilliseconds\n  [$__interval]\n)"
+                },
+                {
+                    "refId": "P95",
+                    "expr": "quantile_over_time(0.95,\n  {app=~\"$app\", env=~\"$env\"}\n  |= \"Request finished\" | json | unwrap ElapsedMilliseconds\n  [$__interval]\n)"
+                },
+                {
+                    "refId": "P99",
+                    "expr": "quantile_over_time(0.99,\n  {app=~\"$app\", env=~\"$env\"}\n  |= \"Request finished\" | json | unwrap ElapsedMilliseconds\n  [$__interval]\n)"
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "title": "Slow requests (> 100 ms) per time period (by app)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 26
+            },
+            "datasource": {
+                "type": "loki",
+                "uid": "${DS_LOKI}"
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "sum by (app) (\n  count_over_time(\n    {app=~\"$app\", env=~\"$env\"}\n    |= \"Request finished\" | json | unwrap ElapsedMilliseconds\n    | ElapsedMilliseconds > 100\n    [$__interval]\n  )\n)"
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "title": "Status code breakdown (2xx / 4xx / 5xx) by app",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 26
+            },
+            "datasource": {
+                "type": "loki",
+                "uid": "${DS_LOKI}"
+            },
+            "targets": [
+                {
+                    "refId": "2XX",
+                    "expr": "sum by (app) (\n  count_over_time(\n    {app=~\"$app\", env=~\"$env\"}\n    |= \"Request finished\" |~ \"StatusCode\\\":2[0-9][0-9]\"\n    [$__interval]\n  )\n)"
+                },
+                {
+                    "refId": "4XX",
+                    "expr": "sum by (app) (\n  count_over_time(\n    {app=~\"$app\", env=~\"$env\"}\n    |= \"Request finished\" |~ \"StatusCode\\\":4[0-9][0-9]\"\n    [$__interval]\n  )\n)"
+                },
+                {
+                    "refId": "5XX",
+                    "expr": "sum by (app) (\n  count_over_time(\n    {app=~\"$app\", env=~\"$env\"}\n    |= \"Request finished\" |~ \"StatusCode\\\":5[0-9][0-9]\"\n    [$__interval]\n  )\n)"
+                }
+            ]
+        },
+        {
+            "type": "row",
+            "title": "Endpoints",
+            "collapsed": false,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 34
+            }
+        },
+        {
+            "id": 7,
+            "title": "Top endpoints by request volume",
+            "type": "barchart",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 35
+            },
+            "datasource": {
+                "type": "loki",
+                "uid": "${DS_LOKI}"
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "instant": true,
+                    "expr": "topk(10,\n  sum by (RequestPath) (\n    count_over_time(\n      {app=~\"$app\", env=~\"$env\"}\n      |= \"Request finished\" | json | RequestPath != \"/metrics\" | RequestPath=~\"$path\"\n      [$__range]\n    )\n  )\n)"
+                }
+            ]
+        },
+        {
+            "id": 8,
+            "title": "Top endpoints by error count (5xx)",
+            "type": "barchart",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 35
+            },
+            "datasource": {
+                "type": "loki",
+                "uid": "${DS_LOKI}"
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "instant": true,
+                    "expr": "topk(10,\n  sum by (RequestPath) (\n    count_over_time(\n      {app=~\"$app\", env=~\"$env\"}\n      |= \"Request finished\" | json | RequestPath=~\"$path\" | line_format \"{{ .StatusCode }}\" |~ \"5[0-9][0-9]\"\n      [$__range]\n    )\n  )\n)"
+                }
+            ]
+        },
+        {
+            "type": "row",
+            "title": "Drill-down",
+            "collapsed": false,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 43
+            }
+        },
+        {
+  "id": 11,
+  "type": "table",
+  "title": "Recent request finishes (click TraceId to drill into full trace)",
+  "gridPos": { "x": 0, "y": 44, "h": 10, "w": 24 },
+  "datasource": { "type": "loki", "uid": "${DS_LOKI}" },
+  "pluginVersion": "12.2.0-16895479002",
+  "targets": [
+    {
+      "refId": "A",
+      "expr": "{app=~\"$app\", env=~\"$env\"}\n  |= \"Request finished\"\n  | json\n  | RequestPath=~\"$path\"\n  | RequestPath != \"/metrics\"\n  | TraceId != \"\""
+    }
+  ],
+  "transformations": [
+    { "id": "labelsToFields", "options": {} },
+    { "id": "extractFields", "options": { "source": "Line", "format": "auto" } },
+    {
+      "id": "filterFieldsByName",
+      "options": {
+        "include": ["Time", "app", "TraceId", "RequestPath", "StatusCode", "ElapsedMilliseconds"]
+      }
+    },
+    {
+      "id": "convertFieldType",
+      "options": {
+        "conversions": [
+          { "destinationType": "number", "targetField": "ElapsedMilliseconds" },
+          { "destinationType": "number", "targetField": "StatusCode" }
+        ]
+      }
+    },
+    {
+      "id": "organize",
+      "options": {
+        "indexByName": {
+          "Time": 0,
+          "app": 1,
+          "TraceId": 2,
+          "RequestPath": 3,
+          "StatusCode": 4,
+          "duration_ms": 5
+        },
+        "renameByName": {
+          "ElapsedMilliseconds": "duration_ms"
+        }
+      }
+    },
+    { "id": "sortBy", "options": { "fields": [ { "desc": true, "field": "Time" } ] } }
+  ],
+  "fieldConfig": {
+    "defaults": {
+      "unit": "none",
+      "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false },
+      "mappings": [],
+      "thresholds": { "mode": "absolute", "steps": [ { "value": null, "color": "green" }, { "value": 80, "color": "red" } ] }
+    },
+    "overrides": [
+      {
+        "matcher": { "id": "byName", "options": "duration_ms" },
+        "properties": [ { "id": "unit", "value": "ms" } ]
+      },
+      {
+        "matcher": { "id": "byName", "options": "TraceId" },
+        "properties": [
+          {
+            "id": "links",
+            "value": [
+              {
+                "title": "Open trace on this dashboard",
+                "url": "/d/${__dashboard.uid}?var-trace=${__value.raw}&var-app=${app}&var-env=${env}&var-path=${path}&from=${__from}&to=${__to}",
+                "targetBlank": false
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "options": {
+    "showHeader": true,
+    "cellHeight": "sm",
+    "footer": { "show": false, "reducer": ["sum"], "countRows": false, "fields": "" }
+  }
+}
+,
+        {
+            "id": 21,
+            "type": "logs",
+            "title": "Trace details (TraceId=${trace})",
+            "gridPos": {
+                "x": 0,
+                "y": 55,
+                "h": 12,
+                "w": 24
+            },
+            "datasource": {
+                "type": "loki",
+                "uid": "${DS_LOKI}"
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "{app=~\"$app\", env=~\"$env\"}\n| json\n| TraceId=\"${trace}\""
+                }
+            ],
+            "options": {
+                "showTime": true,
+                "wrapLogMessage": false,
+                "enableLogDetails": true,
+                "sortOrder": "Descending",
+                "dedupStrategy": "none"
+            }
+        },
+        {
+            "id": 9,
+            "title": "Recent exceptions (table)",
+            "type": "logs",
+            "gridPos": {
+                "h": 10,
+                "w": 12,
+                "x": 0,
+                "y": 54
+            },
+            "datasource": {
+                "type": "loki",
+                "uid": "${DS_LOKI}"
+            },
+            "options": {
+                "showTime": true,
+                "wrapLogMessage": false,
+                "enableLogDetails": true,
+                "sortOrder": "Descending",
+                "dedupStrategy": "none"
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "{app=~\"$app\", env=~\"$env\"} | json | level=\"error\" | RequestPath=~\"$path\""
+                }
+            ]
+        },
+        {
+            "id": 10,
+            "title": "RequestId explorer",
+            "type": "logs",
+            "gridPos": {
+                "h": 10,
+                "w": 12,
+                "x": 12,
+                "y": 54
+            },
+            "datasource": {
+                "type": "loki",
+                "uid": "${DS_LOKI}"
+            },
+            "options": {
+                "showTime": true,
+                "wrapLogMessage": false,
+                "enableLogDetails": true,
+                "sortOrder": "Descending",
+                "dedupStrategy": "none"
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "{app=~\"$app\", env=~\"$env\"} | json | RequestId != \"\" | RequestPath=~\"$path\""
+                }
+            ]
+        }
+    ],
+    "refresh": "10s",
+    "schemaVersion": 39,
+    "style": "dark",
+    "tags": [
+        "loki",
+        "observability",
+        "api",
+        "v12"
+    ],
+    "templating": {
+        "list": [
+            {
+                "name": "DS_LOKI",
+                "label": "Loki",
+                "type": "datasource",
+                "query": "loki"
+            },
+            {
+                "name": "env",
+                "label": "Environment",
+                "type": "query",
+                "datasource": {
+                    "type": "loki",
+                    "uid": "${DS_LOKI}"
+                },
+                "query": "label_values(env)",
+                "refresh": 1,
+                "includeAll": true,
+                "multi": true,
+                "allValue": ".+"
+            },
+            {
+                "name": "app",
+                "label": "App",
+                "type": "query",
+                "datasource": {
+                    "type": "loki",
+                    "uid": "${DS_LOKI}"
+                },
+                "query": "label_values(app)",
+                "refresh": 1,
+                "includeAll": true,
+                "multi": true,
+                "allValue": ".+"
+            },
+            {
+                "name": "path",
+                "label": "Path",
+                "type": "custom",
+                "query": ".+,/Users,/Users/error,/Payments,/Orders"
+            },
+            {
+                "name": "trace",
+                "label": "TraceId",
+                "type": "textbox",
+                "hide": 0,
+                "query": "",
+                "current": {
+                    "selected": false,
+                    "text": "",
+                    "value": ""
+                },
+                "options": [],
+                "description": "Paste or click a TraceId to filter the Trace details panel"
+            }
+        ]
+    },
+    "time": {
+        "from": "now-6h",
+        "to": "now"
+    },
+    "timepicker": {
+        "refresh_intervals": [
+            "5s",
+            "10s",
+            "30s",
+            "1m",
+            "5m"
+        ],
+        "time_options": [
+            "5m",
+            "15m",
+            "1h",
+            "6h",
+            "12h",
+            "24h",
+            "2d",
+            "7d"
+        ]
+    },
+    "timezone": "",
+    "title": "BFF + Services — API Observability (With Traces - Experimental)",
+    "uid": "bff-api-obsv-v12-traces",
+    "version": 4,
+    "weekStart": ""
+}

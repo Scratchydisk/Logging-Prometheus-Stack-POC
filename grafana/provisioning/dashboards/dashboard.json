@@ -257,8 +257,8 @@
     "time_options": ["5m","15m","1h","6h","12h","24h","2d","7d"]
   },
   "timezone": "",
-  "title": "BFF + Services — API Observability (v12, non-empty regexes)",
-  "uid": "bff-api-obsv-v12-nonempty",
+  "title": "BFF + Services — API Observability (Basic)",
+  "uid": "bff-api-obsv-v12-basic",
   "version": 1,
   "weekStart": ""
 }

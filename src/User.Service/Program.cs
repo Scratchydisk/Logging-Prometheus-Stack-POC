@@ -1,14 +1,9 @@
 using Serilog;
-using Serilog.Sinks.Http.BatchFormatters;
-using Serilog.Formatting.Compact;
-
 using Prometheus;
 using Serilog.Sinks.Grafana.Loki;
+using Serilog.Enrichers.Span;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Enable Serilog SelfLog
-Serilog.Debugging.SelfLog.Enable(msg => File.AppendAllText("serilog-selflog.txt", msg + Environment.NewLine));
 
 builder.Host.UseSerilog((context, services, configuration) =>
 {
@@ -27,11 +22,12 @@ builder.Host.UseSerilog((context, services, configuration) =>
     };
 
     configuration
-        .MinimumLevel.Debug()
+        .MinimumLevel.Information()
         .Enrich.FromLogContext()
-        .Enrich.WithProperty("Application", context.Configuration["ApplicationName"])
+        .Enrich.WithProperty("Application", applicationName)
         .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName)
-        .WriteTo.Console(new Serilog.Formatting.Json.JsonFormatter())
+        .Enrich.WithSpan()
+        .WriteTo.Console()
         .WriteTo.GrafanaLoki(
             lokiUrl,
             credentials: null,
@@ -63,13 +59,12 @@ app.MapControllers();
 
 app.MapMetrics();
 
-// Add logging statements
-app.Use(async (context, next) =>
+try
 {
-    Log.Information("Handling request: {Method} {Path}", context.Request.Method, context.Request.Path);
-    await next.Invoke();
-    Log.Information("Finished handling request.");
-});
-
-app.Run();
+    app.Run();
+}
+finally
+{
+    Log.CloseAndFlush();
+}
 
