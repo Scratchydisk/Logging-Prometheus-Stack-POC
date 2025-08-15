@@ -289,97 +289,173 @@
             }
         },
         {
-  "id": 11,
-  "type": "table",
-  "title": "Recent request finishes (click TraceId to drill into full trace)",
-  "gridPos": { "x": 0, "y": 44, "h": 10, "w": 24 },
-  "datasource": { "type": "loki", "uid": "${DS_LOKI}" },
-  "pluginVersion": "12.2.0-16895479002",
-  "targets": [
-    {
-      "refId": "A",
-      "expr": "{app=~\"$app\", env=~\"$env\"}\n  |= \"Request finished\"\n  | json\n  | RequestPath=~\"$path\"\n  | RequestPath != \"/metrics\"\n  | TraceId != \"\""
-    }
-  ],
-  "transformations": [
-    { "id": "labelsToFields", "options": {} },
-    { "id": "extractFields", "options": { "source": "Line", "format": "auto" } },
-    {
-      "id": "filterFieldsByName",
-      "options": {
-        "include": ["Time", "app", "TraceId", "RequestPath", "StatusCode", "ElapsedMilliseconds"]
-      }
-    },
-    {
-      "id": "convertFieldType",
-      "options": {
-        "conversions": [
-          { "destinationType": "number", "targetField": "ElapsedMilliseconds" },
-          { "destinationType": "number", "targetField": "StatusCode" }
-        ]
-      }
-    },
-    {
-      "id": "organize",
-      "options": {
-        "indexByName": {
-          "Time": 0,
-          "app": 1,
-          "TraceId": 2,
-          "RequestPath": 3,
-          "StatusCode": 4,
-          "duration_ms": 5
-        },
-        "renameByName": {
-          "ElapsedMilliseconds": "duration_ms"
-        }
-      }
-    },
-    { "id": "sortBy", "options": { "fields": [ { "desc": true, "field": "Time" } ] } }
-  ],
-  "fieldConfig": {
-    "defaults": {
-      "unit": "none",
-      "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false },
-      "mappings": [],
-      "thresholds": { "mode": "absolute", "steps": [ { "value": null, "color": "green" }, { "value": 80, "color": "red" } ] }
-    },
-    "overrides": [
-      {
-        "matcher": { "id": "byName", "options": "duration_ms" },
-        "properties": [ { "id": "unit", "value": "ms" } ]
-      },
-      {
-        "matcher": { "id": "byName", "options": "TraceId" },
-        "properties": [
-          {
-            "id": "links",
-            "value": [
+            "id": 11,
+            "type": "table",
+            "title": "Recent request finishes (click TraceId to drill into full trace)",
+            "gridPos": {
+                "x": 0,
+                "y": 44,
+                "h": 10,
+                "w": 24
+            },
+            "datasource": {
+                "type": "loki",
+                "uid": "${DS_LOKI}"
+            },
+            "pluginVersion": "12.2.0-16895479002",
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "{app=~\"$app\", env=~\"$env\"}\n  |= \"Request finished\"\n  | json\n  | RequestPath=~\"$path\"\n  | RequestPath != \"/metrics\"\n  | TraceId != \"\""
+                }
+            ],
+            "transformations": [
+                {
+                    "id": "labelsToFields",
+                    "options": {}
+                },
+                {
+                    "id": "extractFields",
+                    "options": {
+                        "source": "Line",
+                        "format": "auto"
+                    }
+                },
+                {
+                    "id": "filterFieldsByName",
+                    "options": {
+                        "include": [
+                            "Time",
+                            "app",
+                            "TraceId",
+                            "RequestPath",
+                            "StatusCode",
+                            "ElapsedMilliseconds"
+                        ]
+                    }
+                },
+                {
+                    "id": "convertFieldType",
+                    "options": {
+                        "conversions": [
+                            {
+                                "destinationType": "number",
+                                "targetField": "ElapsedMilliseconds"
+                            },
+                            {
+                                "destinationType": "number",
+                                "targetField": "StatusCode"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "indexByName": {
+                            "Time": 0,
+                            "app": 1,
+                            "TraceId": 2,
+                            "RequestPath": 3,
+                            "StatusCode": 4,
+                            "duration_ms": 5
+                        },
+                        "renameByName": {
+                            "ElapsedMilliseconds": "duration_ms"
+                        }
+                    }
+                },
+                {
+                    "id": "sortBy",
+                    "options": {
+                        "fields": [
+                            {
+                                "desc": true,
+                                "field": "Time"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "none",
+                    "custom": {
+                        "align": "auto",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "value": null,
+                                "color": "green"
+                            },
+                            {
+                                "value": 80,
+                                "color": "red"
+                            }
+                        ]
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "duration_ms"
+                        },
+                        "properties": [
+                            {
+                                "id": "unit",
+                                "value": "ms"
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "TraceId"
+                        },
+                        "properties": [
+                            {
+                                "id": "links",
+                                "value": [
               {
                 "title": "Open trace on this dashboard",
-                "url": "/d/${__dashboard.uid}?var-trace=${__value.raw}&var-app=${app}&var-env=${env}&var-path=${path}&from=${__from}&to=${__to}",
+                "url": "/d/${__dashboard.uid}?from=${__from}&to=${__to}&var-trace=${__value.raw}&viewPanel=21",
                 "targetBlank": false
               }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  "options": {
-    "showHeader": true,
-    "cellHeight": "sm",
-    "footer": { "show": false, "reducer": ["sum"], "countRows": false, "fields": "" }
-  }
-}
-,
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "options": {
+                "showHeader": true,
+                "cellHeight": "sm",
+                "footer": {
+                    "show": false,
+                    "reducer": [
+                        "sum"
+                    ],
+                    "countRows": false,
+                    "fields": ""
+                }
+            }
+        },
         {
             "id": 21,
             "type": "logs",
-            "title": "Trace details (TraceId=${trace})",
+            "title": "Trace details — set via TraceId (TraceId=${trace})",
+            "description": "This panel shows all logs for the selected TraceId. Click a TraceId in panel 11 to populate, or paste a value into the 'TraceId' variable.",
             "gridPos": {
                 "x": 0,
-                "y": 55,
+                "y": 66,
                 "h": 12,
                 "w": 24
             },
@@ -390,7 +466,7 @@
             "targets": [
                 {
                     "refId": "A",
-                    "expr": "{app=~\"$app\", env=~\"$env\"}\n| json\n| TraceId=\"${trace}\""
+                    "expr": "{env=~\"$env\"}\n|= \"${trace}\"\n| json"
                 }
             ],
             "options": {
